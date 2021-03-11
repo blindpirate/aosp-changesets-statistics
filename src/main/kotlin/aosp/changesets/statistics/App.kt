@@ -19,22 +19,30 @@ fun main() {
     val sinceDate = LocalDate.parse(System.clearProperty("since") ?: throw IllegalArgumentException("You must set -Dsince=yyyy-MM-dd!"))
     var current = sinceDate
     while (current <= LocalDate.now()) {
-        if (File("build/${current}.json").isFile) {
-            System.out.println("${current}.json already exists, skip.")
-            continue
+        try {
+            queryAndSave(current)
+        } catch (e: Exception) {
+            // Sometimes there're too many data (>10000) at a single day.
+            if (e.message?.contains("retcode: 400") == true) {
+                queryAndSave(current, "00", "11")
+                queryAndSave(current, "12", "23")
+            }
         }
-
-        queryAndSave(current)
         current = current.plusDays(1)
     }
 }
 
 val objectMapper = ObjectMapper()
-fun queryAndSave(date: LocalDate) {
+fun queryAndSave(date: LocalDate, startHour: String = "00", endHour: String = "23"  /* 00 - 23 */) {
+    val file = File("build/$date-$startHour-$endHour.json")
+    if (file.exists()) {
+        println("${file.absolutePath} already exists, skip.")
+        return
+    }
     val changesetsOfDay = mutableListOf<Changeset>()
     var cursor = 0
     while (true) {
-        val url = buildUrl(cursor, defaultPageSize, date)
+        val url = buildUrl(cursor, defaultPageSize, date, startHour, endHour)
         // )]}'\n[{"id":
         val json = request(url).substringAfter("\n")
         val changesets = objectMapper.readValue(json, object : TypeReference<List<Changeset>>() {})
@@ -45,14 +53,13 @@ fun queryAndSave(date: LocalDate) {
         changesetsOfDay.addAll(changesets)
         cursor += defaultPageSize
     }
-    val file = File("build/$date.json")
     file.writeText(objectMapper.writeValueAsString(changesetsOfDay))
     println("Saved ${changesetsOfDay.size} changesets to ${file.absolutePath}")
 }
 
 // https://stackoverflow.com/questions/45084860/query-past-the-500-limit-in-gerrit-rest-api
-fun buildUrl(start: Int, pageSize: Int, date: LocalDate): String {
-    val query = URLEncoder.encode("after:{$date 00:00:00.000} AND before:{$date 23:59:99.999}", StandardCharsets.UTF_8)
+fun buildUrl(start: Int, pageSize: Int, date: LocalDate, startHour: String = "00", endHour: String = "23"): String {
+    val query = URLEncoder.encode("after:{$date $startHour:00:00.000} AND before:{$date $endHour:59:99.999}", StandardCharsets.UTF_8)
     return "https://android-review.googlesource.com/changes/?O=81&S=$start&n=${pageSize}&q=$query"
 }
 
