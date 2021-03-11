@@ -26,7 +26,7 @@ tasks.named<JavaExec>("run") {
 }
 
 tasks.register<JavaExec>("analyze") {
-    dependsOn("run")
+    mustRunAfter("run")
     classpath = sourceSets["main"].runtimeClasspath
     mainClass.set("aosp.changesets.statistics.EmailDomainAnalysisKt")
 }

@@ -19,17 +19,25 @@ fun main() {
     val sinceDate = LocalDate.parse(System.clearProperty("since") ?: throw IllegalArgumentException("You must set -Dsince=yyyy-MM-dd!"))
     var current = sinceDate
     while (current <= LocalDate.now()) {
-        try {
-            queryAndSave(current)
-        } catch (e: Exception) {
-            // Sometimes there're too many data (>10000) at a single day.
-            if (e.message?.contains("retcode: 400") == true) {
-                for (i in 0 until 24) {
-                    queryAndSave(current, String.format("%02d", i), String.format("%02d", i))
+        if (!dateFinished(current)) {
+            try {
+                queryAndSave(current)
+            } catch (e: Exception) {
+                // Sometimes there're too many data (>10000) at a single day.
+                if (e.message?.contains("retcode: 400") == true) {
+                    for (i in 0 until 24) {
+                        queryAndSave(current, String.format("%02d", i), String.format("%02d", i))
+                    }
                 }
             }
         }
         current = current.plusDays(1)
+    }
+}
+
+fun dateFinished(date: LocalDate): Boolean {
+    return File("build/$date.json").exists() || IntRange(0, 23).all {
+        File("build/$date-${String.format("%02d", it)}-${String.format("%02d", it)}.json").exists()
     }
 }
 
@@ -39,10 +47,7 @@ fun queryAndSave(date: LocalDate, startHour: String = "00", endHour: String = "2
         File("build/$date.json")
     else
         File("build/$date-$startHour-$endHour.json")
-    if (file.exists()) {
-        println("${file.absolutePath} already exists, skip.")
-        return
-    }
+
     val changesetsOfDay = mutableListOf<Changeset>()
     var cursor = 0
     while (true) {
