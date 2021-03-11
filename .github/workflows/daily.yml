@@ -1,7 +1,7 @@
 name: refresh-data-daily
 on:
   schedule:
-    - cron: '42 0 * * *'
+    - cron: '42 13 * * *'
 
 jobs:
   remember-brave-people:
