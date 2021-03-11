@@ -1,6 +1,6 @@
 # AOSP Gerrit Crawler
 
-This is a crawler to crawl ASOP Gerrit `/changes` API for further investigation.
+This is a crawler to crawl AOSP Gerrit `/changes` API for further investigation.
 
 ## Usage
 
@@ -22,4 +22,6 @@ build
 |--- 2021-03-09.json
 ...
 ```
+
+The progress can be auto-recovered if the program crashes or is interrupted.  
 
