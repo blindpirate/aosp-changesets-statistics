@@ -14,18 +14,18 @@ fun main() {
             return@forEach
         }
         val changesets = objectMapper.readValue(it, object : TypeReference<List<Changeset>>() {})
-        changesets.forEach {
-            val emailDomain = it.submitter?.email?.substringAfter("@") ?: it.owner.email.substringAfter("@")
+        for (changeset in changesets) {
+            val emailDomain = changeset.submitter?.email?.substringAfter("@") ?: changeset.owner?.email?.substringAfter("@") ?: continue
 
-            val changeset = emailDomainToChangesetNum[emailDomain] ?: 0
+            val changesetNum = emailDomainToChangesetNum[emailDomain] ?: 0
             val insertion = emailDomainToInsertionNum[emailDomain] ?: 0
             val deletion = emailDomainToDeletionNum[emailDomain] ?: 0
             val insertionDeletion = emailDomainToInsertionDeletionNum[emailDomain] ?: 0
 
-            val insertionOfCurrentChangeSet = if (it.insertions != null) it.insertions else 0
-            val deletionOfCurrentChangeSet = if (it.deletions != null) it.deletions else 0
+            val insertionOfCurrentChangeSet = if (changeset.insertions != null) changeset.insertions else 0
+            val deletionOfCurrentChangeSet = if (changeset.deletions != null) changeset.deletions else 0
 
-            emailDomainToChangesetNum[emailDomain] = changeset + 1
+            emailDomainToChangesetNum[emailDomain] = changesetNum + 1
             emailDomainToInsertionNum[emailDomain] = insertion + insertionOfCurrentChangeSet
             emailDomainToDeletionNum[emailDomain] = deletion + deletionOfCurrentChangeSet
             emailDomainToInsertionDeletionNum[emailDomain] = insertionDeletion + deletionOfCurrentChangeSet + insertionOfCurrentChangeSet
