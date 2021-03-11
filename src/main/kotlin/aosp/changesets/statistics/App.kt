@@ -24,10 +24,9 @@ fun main() {
         } catch (e: Exception) {
             // Sometimes there're too many data (>10000) at a single day.
             if (e.message?.contains("retcode: 400") == true) {
-                queryAndSave(current, "00", "05")
-                queryAndSave(current, "06", "11")
-                queryAndSave(current, "12", "17")
-                queryAndSave(current, "18", "23")
+                for (i in 0 until 24) {
+                    queryAndSave(current, String.format("%02d", i), String.format("%02d", i))
+                }
             }
         }
         current = current.plusDays(1)
