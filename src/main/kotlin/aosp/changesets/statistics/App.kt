@@ -34,7 +34,10 @@ fun main() {
 
 val objectMapper = ObjectMapper()
 fun queryAndSave(date: LocalDate, startHour: String = "00", endHour: String = "23"  /* 00 - 23 */) {
-    val file = File("build/$date-$startHour-$endHour.json")
+    val file = if (startHour == "00" && endHour == "23")
+        File("build/$date.json")
+    else
+        File("build/$date-$startHour-$endHour.json")
     if (file.exists()) {
         println("${file.absolutePath} already exists, skip.")
         return
