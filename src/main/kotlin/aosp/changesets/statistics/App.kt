@@ -21,6 +21,7 @@ fun main() {
     while (current <= LocalDate.now()) {
         if (File("build/${current}.json").isFile) {
             System.out.println("${current}.json already exists, skip.")
+            continue
         }
 
         queryAndSave(current)

@@ -25,3 +25,7 @@ build
 
 The progress can be auto-recovered if the program crashes or is interrupted.  
 
+### Analyze the data
+
+To analyze the data, an example is present at `EmailDomainAnalysis`. 
+You can run `./gradlew analyze` to analyze the generated JSON data.

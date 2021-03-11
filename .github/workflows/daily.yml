@@ -1,0 +1,14 @@
+name: refresh-data-daily
+on:
+  schedule:
+    - cron: '42 0 * * *'
+
+jobs:
+  remember-brave-people:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          ref: master
+      - name: Fetch data and analyze
+        run: ./gradlew run analyze -Dsince=2015-01-01
