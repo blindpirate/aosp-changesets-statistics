@@ -30,6 +30,8 @@ fun main() {
                     }
                 }
             }
+        } else {
+            println("Skip processed $current")
         }
         current = current.plusDays(1)
     }
