@@ -24,8 +24,10 @@ fun main() {
         } catch (e: Exception) {
             // Sometimes there're too many data (>10000) at a single day.
             if (e.message?.contains("retcode: 400") == true) {
-                queryAndSave(current, "00", "11")
-                queryAndSave(current, "12", "23")
+                queryAndSave(current, "00", "05")
+                queryAndSave(current, "06", "11")
+                queryAndSave(current, "12", "17")
+                queryAndSave(current, "18", "23")
             }
         }
         current = current.plusDays(1)
@@ -52,7 +54,7 @@ fun queryAndSave(date: LocalDate, startHour: String = "00", endHour: String = "2
         if (changesets.isEmpty()) {
             break
         }
-        println("Fetched data from $cursor at $date")
+        println("Fetched data from $cursor at $date $startHour:00:00-$endHour:59:59")
         changesetsOfDay.addAll(changesets)
         cursor += defaultPageSize
     }
